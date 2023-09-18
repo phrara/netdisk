@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"netdisk/tool"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -51,13 +52,17 @@ func posts(r *gin.Engine) {
 	
 
 	// 公共资源仓库
-	r.POST("/upload", UploadFileHandler)
+	r.POST("/upload", UploadSourceHandler)
+	r.POST("/detail", DetailSourceHandler)
+	r.POST("download", DownloadSourceHandler)
 	// 私人
 	r.POST("/personalSave", SavePersonalFileHandler)
 	r.POST("/personalList", PersonalRepoListHandler)
 	// 课程
 	r.POST("/courseSave", SaveCourseFileHandler)
 	r.POST("/courseList", CourseRepoListHandler)
+	r.POST("/courseDel", DeleteCourseSourceHandler)
+	r.POST("/courseMove", MoveCourseSourceHandler)
 }
 
 // token验签

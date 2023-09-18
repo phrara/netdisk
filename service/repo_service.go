@@ -18,20 +18,28 @@ func NewRepoService() *RepoService {
 }
 
 
-func (rs *RepoService) UploadFile(repo *model.Repository, content []byte) tool.Res {
+func (rs *RepoService) UploadSource(repo *model.Repository, content []byte) tool.Res {
 	repo.Filename = strings.Trim(repo.Filename, " ")
 	if tool.WordsInspect(repo.Filename) {
-		// 判断文件是否已存储
-		if rs.repoDao.RepoInfo(repo).Filename == "" {
+		// 判断文件是否已存储, 秒传
+		repo = rs.repoDao.RepoInfo(repo)
+		if repo.Filename == "" {
 	
 			// 上传到COS
-			cosPath := "repository/" + repo.Hash + repo.Ext
-			if path, err := tool.COSUpload(content, cosPath); err != nil {
-				return tool.GetBadResult("COS upload failed")
+			cosPath := tool.Conf.COS.InnerPath + repo.Hash + repo.Ext
+			// 小文件
+			if repo.Size <= tool.Conf.COS.ChunkSize {
+				if err := tool.COSUpload(content, cosPath); err != nil {
+					return tool.GetBadResult("COS upload failed")
+				} 
 			} else {
-				repo.Path = path
+				// 分片
+				if err := tool.COSMultipartUpload(content, cosPath) ; err != nil{
+					return tool.GetBadResult("COS multipart upload failed")
+				} 
 			}
-	
+			repo.Path = cosPath
+			
 			// 本地记录
 			if rs.repoDao.AddRepo(repo) {
 				return tool.GetGoodResult(repo)
@@ -39,7 +47,7 @@ func (rs *RepoService) UploadFile(repo *model.Repository, content []byte) tool.R
 				return tool.GetBadResult("upload failed")
 			}
 		} else {
-			return tool.GetBadResult("file exists")	
+			return tool.GetGoodResult(repo)
 		}
 	} else {
 		return tool.GetBadResult("illegal words")
@@ -48,7 +56,24 @@ func (rs *RepoService) UploadFile(repo *model.Repository, content []byte) tool.R
 }
 
 
-func (rs *RepoService) SavePersonalFile(pr *model.PersonalRepository) tool.Res {
+func (rs *RepoService) GetRepoDetails(repo *model.Repository) tool.Res {
+	return tool.GetGoodResult(rs.repoDao.RepoDetail(repo))
+}
+
+func (rs *RepoService) DownloadSource(repo *model.Repository) tool.Res {
+	r := rs.repoDao.RepoDetail(repo)
+	if r.Hash != "" && r.Path != "" {
+		if file, err := tool.COSDownload(r.Path); err != nil {
+			return tool.GetBadResult("COS download failed")
+		} else {
+			return tool.GetGoodResult(file)
+		}
+	} else {
+		return tool.GetBadResult("source do not exists")
+	}
+}
+
+func (rs *RepoService) SavePersonalSource(pr *model.PersonalRepository) tool.Res {
 	pr.SrcName = strings.Trim(pr.SrcName, " ")
 	if tool.WordsInspect(pr.SrcName) {
 		if rs.repoDao.PersonalRepoInfo(pr).SrcName == "" {
@@ -66,8 +91,7 @@ func (rs *RepoService) SavePersonalFile(pr *model.PersonalRepository) tool.Res {
 
 }
 
-
-func (rs *RepoService) SaveCourseFile(pr *model.CourseRepository) tool.Res {
+func (rs *RepoService) SaveCourseSource(pr *model.CourseRepository) tool.Res {
 	pr.SrcName = strings.Trim(pr.SrcName, " ")
 	pr.Cid = 1
 	if tool.WordsInspect(pr.SrcName) {
@@ -103,7 +127,20 @@ func (rs *RepoService) GetRepoList(info model.Repo) tool.Res {
 	default: 
 		return tool.GetBadResult("unkown type")
 	}
+}
 
-	
+func (rs *RepoService) DeleteCourseSource(rp *model.CourseRepository) tool.Res {
+	if rs.repoDao.DeleteCourseRepo(rp) {
+		return tool.GetGoodResult(nil)
+	} else {
+		return tool.GetBadResult("delete failed")
+	}
 }
 	
+func (rs *RepoService) MoveCourseSource(rp *model.CourseRepository) tool.Res {
+	if rs.repoDao.UpdateCourseRepoParentID(rp) {
+		return tool.GetGoodResult(rp)
+	} else {
+		return tool.GetBadResult("move failed")
+	}
+}

@@ -27,6 +27,11 @@ func (rd *RepoDao) RepoInfo(repo *model.Repository) *model.Repository {
 	return r
 }
 
+func (rd *RepoDao) RepoDetail(repo *model.Repository) *model.Repository {
+	DBMgr.Where("rid = ?", repo.Rid).First(repo)
+	return repo
+}
+
 func (rd *RepoDao) TotalRepoList() []*model.PersonalRepository {
 	rpList := make([]*model.PersonalRepository, 10)
 	DBMgr.Find(&rpList)
@@ -79,4 +84,22 @@ func (rd *RepoDao) CourseRepoList(info *model.CourseRepository) []*model.CourseR
 	rpList := make([]*model.CourseRepository, 10)
 	DBMgr.Where("cid = ? and parent_id = ?", info.Cid, info.ParentId).Find(&rpList)
 	return rpList
+}
+
+func (rd *RepoDao) DeleteCourseRepo(rp *model.CourseRepository) bool {
+	res := DBMgr.Where("crid = ?", rp.CRid).Delete(rp)
+	if res.RowsAffected > 0 {
+		return true
+	} else {
+		return false
+	}
+} 
+
+func (rd *RepoDao) UpdateCourseRepoParentID(rp *model.CourseRepository) bool {
+	res := DBMgr.Model(rp).Where("crid = ?", rp.CRid).Update("parent_id", rp.ParentId)
+	if res.RowsAffected > 0 {
+		return true
+	} else {
+		return false
+	}
 }

@@ -6,6 +6,8 @@ cos:
   cosBucketAddr: https://netdisk-1304379399.cos.ap-beijing.myqcloud.com
   secretId: AKID3b4KXfhYCdtAJi4LWbeXEj196yDKGy0p
   secretKey: lKgpmW3kLkwvkMk05zgdS4TfcZSARUce
+  innerPath: repository/
+  chunkSize: 16 # MB 
 
 dataSource:
   sourceName: mysql

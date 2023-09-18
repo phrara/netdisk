@@ -60,6 +60,9 @@ type COS struct {
 	COSBucketAddr string `yaml:"cosBucketAddr"`
 	SecretID      string `yaml:"secretId"`
 	SecretKey     string `yaml:"secretKey"`
+	InnerPath string `yaml:"innerPath"`
+	// MB
+	ChunkSize int `yaml:"chunkSize"`
 }
 
 type DataSource struct {
