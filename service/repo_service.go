@@ -83,7 +83,7 @@ func (rs *RepoService) SavePersonalSource(pr *model.PersonalRepository) tool.Res
 				return tool.GetBadResult("save failed")
 			}
 		} else {
-			return tool.GetBadResult("src exists")
+			return tool.GetGoodResult("src exists")
 		}
 	} else {
 		return tool.GetBadResult("illegal words")
@@ -102,7 +102,7 @@ func (rs *RepoService) SaveCourseSource(pr *model.CourseRepository) tool.Res {
 				return tool.GetBadResult("save failed")
 			}
 		} else {
-			return tool.GetBadResult("src exists")
+			return tool.GetGoodResult("src exists")
 		}
 	} else {
 		return tool.GetBadResult("illegal words")
@@ -129,11 +129,27 @@ func (rs *RepoService) GetRepoList(info model.Repo) tool.Res {
 	}
 }
 
+func (rs *RepoService) DeletePersonalSource(rp *model.PersonalRepository) tool.Res {
+	if rs.repoDao.DeletePersonalRepo(rp) {
+		return tool.GetGoodResult(nil)
+	} else {
+		return tool.GetBadResult("delete failed")
+	}
+}
+
 func (rs *RepoService) DeleteCourseSource(rp *model.CourseRepository) tool.Res {
 	if rs.repoDao.DeleteCourseRepo(rp) {
 		return tool.GetGoodResult(nil)
 	} else {
 		return tool.GetBadResult("delete failed")
+	}
+}
+
+func (rs *RepoService) MovePersonalSource(rp *model.PersonalRepository) tool.Res {
+	if rs.repoDao.UpdatePersonalRepoParentID(rp) {
+		return tool.GetGoodResult(rp)
+	} else {
+		return tool.GetBadResult("move failed")
 	}
 }
 	

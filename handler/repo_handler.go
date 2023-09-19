@@ -98,6 +98,27 @@ func PersonalRepoListHandler(c *gin.Context) {
 	c.JSON(200, r)
 }
 
+// 删除私有资源
+func DeletePersonalSourceHandler(c *gin.Context) {
+	rp := &model.PersonalRepository{}
+	if err := c.ShouldBind(rp); err != nil {
+		return
+	}
+	r := rs.DeletePersonalSource(rp)
+	c.JSON(200, r)
+}
+
+// 移动私有资源
+func MovePersonalSourceHandler(c *gin.Context) {
+	rp := &model.PersonalRepository{}
+	if err := c.ShouldBind(rp); err != nil {
+		return
+	}
+	r := rs.MovePersonalSource(rp)
+	c.JSON(200, r)
+}
+
+
 // 上传到课程仓库
 func SaveCourseFileHandler(c *gin.Context) {
 	pr := &model.CourseRepository{}

@@ -58,6 +58,8 @@ func posts(r *gin.Engine) {
 	// 私人
 	r.POST("/personalSave", SavePersonalFileHandler)
 	r.POST("/personalList", PersonalRepoListHandler)
+	r.POST("/personalDel", DeletePersonalSourceHandler)
+	r.POST("/personalMove", MovePersonalSourceHandler)
 	// 课程
 	r.POST("/courseSave", SaveCourseFileHandler)
 	r.POST("/courseList", CourseRepoListHandler)

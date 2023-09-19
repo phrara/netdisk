@@ -62,6 +62,24 @@ func (rd *RepoDao) PersonalRepoList(info *model.PersonalRepository) []*model.Per
 	return rpList
 }
 
+func (rd *RepoDao) DeletePersonalRepo(rp *model.PersonalRepository) bool {
+	res := DBMgr.Where("prid = ?", rp.PRid).Delete(rp)
+	if res.RowsAffected > 0 {
+		return true
+	} else {
+		return false
+	}
+}
+
+
+func (rd *RepoDao) UpdatePersonalRepoParentID(rp *model.PersonalRepository) bool {
+	res := DBMgr.Model(rp).Where("prid = ?", rp.PRid).Update("parent_id", rp.ParentId)
+	if res.RowsAffected > 0 {
+		return true
+	} else {
+		return false
+	}
+}
 
 //       			!课程共享仓库
 
