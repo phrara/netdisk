@@ -30,6 +30,10 @@ func init() {
 		log.Fatal(e)
 	}
 
+	if Conf.COS.ChunkSize < 4 {
+		log.Fatal("chunk size is too small")
+	}
+
 	u, _ := url.Parse(Conf.COS.COSBucketAddr)
 	b := &cos.BaseURL{BucketURL: u}
 	cosClient = cos.NewClient(b, &http.Client{

@@ -22,8 +22,8 @@ func (rs *RepoService) UploadSource(repo *model.Repository, content []byte) tool
 	repo.Filename = strings.Trim(repo.Filename, " ")
 	if tool.WordsInspect(repo.Filename) {
 		// 判断文件是否已存储, 秒传
-		repo = rs.repoDao.RepoInfo(repo)
-		if repo.Filename == "" {
+		r := rs.repoDao.RepoInfo(repo)
+		if r.Filename == "" {
 	
 			// 上传到COS
 			cosPath := tool.Conf.COS.InnerPath + repo.Hash + repo.Ext
@@ -47,7 +47,7 @@ func (rs *RepoService) UploadSource(repo *model.Repository, content []byte) tool
 				return tool.GetBadResult("upload failed")
 			}
 		} else {
-			return tool.GetGoodResult(repo)
+			return tool.GetGoodResult(r)
 		}
 	} else {
 		return tool.GetBadResult("illegal words")
