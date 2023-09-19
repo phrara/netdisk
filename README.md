@@ -16,6 +16,10 @@ Be sure that there is `/etc/config.yaml` in the wd.
 server:
   ip: 0.0.0.0
   port: 8080
+  name: netdisk
+  token:
+    expireDuration: 24h
+    issuer: xxx
 
 cos:
   cosBucketAddr: 
@@ -30,6 +34,12 @@ dataSource:
   password: xxxxxxx
   address: x.x.x.x:3306
   database: netdisk
+
+email:
+  username: xxxxxxxx@xxxx.com
+  authCode: xxxxxxxxxxxxxx
+    host: smtp.xxxx.com
+    port: 465
 ```
 
 

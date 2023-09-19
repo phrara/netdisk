@@ -1,4 +1,4 @@
-package tool
+package test
 
 import (
 	"bytes"
@@ -18,8 +18,8 @@ func TestCOS1(t *testing.T) {
     client := cos.NewClient(b, &http.Client{
         Transport: &cos.AuthorizationTransport{
             // 通过环境变量获取密钥
-            SecretID: "AKID3b4KXfhYCdtAJi4LWbeXEj196yDKGy0p",  
-            SecretKey: "lKgpmW3kLkwvkMk05zgdS4TfcZSARUce",  
+            SecretID: "",  
+            SecretKey: "",  
         },
     })
 
@@ -43,8 +43,8 @@ func TestCOS2(t *testing.T) {
     client := cos.NewClient(b, &http.Client{
         Transport: &cos.AuthorizationTransport{
             // 通过环境变量获取密钥
-            SecretID: "AKID3b4KXfhYCdtAJi4LWbeXEj196yDKGy0p",  
-            SecretKey: "lKgpmW3kLkwvkMk05zgdS4TfcZSARUce",  
+            SecretID: "",  
+            SecretKey: "",  
         },
     })
 

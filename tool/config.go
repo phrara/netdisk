@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 
 	"github.com/tencentyun/cos-go-sdk-v5"
 	"gopkg.in/yaml.v3"
@@ -34,6 +35,12 @@ func init() {
 		log.Fatal("chunk size is too small")
 	}
 
+	if d, err := time.ParseDuration(Conf.Server.Token.ExpireDuration); err != nil {
+		log.Fatal(err)
+	} else {
+		Conf.Server.Token.expireDuration = d
+	}
+
 	u, _ := url.Parse(Conf.COS.COSBucketAddr)
 	b := &cos.BaseURL{BucketURL: u}
 	cosClient = cos.NewClient(b, &http.Client{
@@ -49,15 +56,24 @@ type Config struct {
 	Server     Server     `yaml:"server"`
 	COS        COS        `yaml:"cos"`
 	DataSource DataSource `yaml:"dataSource"`
+	Email Email `yaml:"email"`
 }
 
 type Server struct {
 	Ip   string `yaml:"ip"`
 	Port string `yaml:"port"`
+	Name string `yaml:"name"`
+	Token Token `yaml:"token"`
 }
 
 func (s Server) String() string {
 	return fmt.Sprintf("%s:%s", s.Ip, s.Port)
+}
+
+type Token struct {
+	ExpireDuration string `yaml:"expireDuration"`
+	expireDuration time.Duration
+	Issuer string `yaml:"issuer"`
 }
 
 type COS struct {
@@ -67,6 +83,21 @@ type COS struct {
 	InnerPath string `yaml:"innerPath"`
 	// MB
 	ChunkSize int `yaml:"chunkSize"`
+}
+
+type Email struct {
+	Username string `yaml:"username"`
+	AuthCode string `yaml:"authCode"`
+	SMTP SMTP `yaml:"smtp"`
+}
+
+type SMTP struct {
+	Host string `yaml:"host"`
+	Port string `yaml:"port"`
+}
+
+func (s SMTP) String() string {
+	return fmt.Sprintf("%s:%s", s.Host, s.Port)
 }
 
 type DataSource struct {

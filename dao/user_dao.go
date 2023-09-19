@@ -7,15 +7,25 @@ import (
 type UserDao struct {
 }
 
-// GetUserInfo 查询用户信息
-func (*UserDao) GetUserInfo(username string) *model.User {
-	user := model.NewUser(0, "", "")
-	DBMgr.Where("username = ?", username).First(user)
-	return user
+// CheckUserInfo 查询用户信息
+func (ud *UserDao) CheckUserInfo(user *model.User) *model.User {
+	u := model.NewUser(0, "", "")
+	DBMgr.Where("username = ? or email = ?", user.Username, user.Email).First(u)
+	return u
+}
+
+func (ud *UserDao) CheckEmail(user *model.User) bool {
+	u := model.NewUser(0, "", "")
+	DBMgr.Where("uid = ? and email = ?", user.Uid, user.Email).First(u)
+	if u.Username != "" {
+		return true
+	} else {
+		return false
+	}
 }
 
 // ValidateUser 登录验证
-func (*UserDao) ValidateUser(user *model.User) *model.User {
+func (ud *UserDao) ValidateUser(user *model.User) *model.User {
 	u := model.NewUser(0, "", "")
 	DBMgr.Where("username = ? and password = ?", user.Username, user.Password).First(u)
 	return u
@@ -23,8 +33,8 @@ func (*UserDao) ValidateUser(user *model.User) *model.User {
 
 // AddUser 添加新用户
 func (ud *UserDao) AddUser(user *model.User) bool {
-	if ud.GetUserInfo(user.Username).Username == "" {
-		DBMgr.Create(user)
+	res := DBMgr.Create(user)
+	if res.RowsAffected > 0 {
 		return true
 	} else {
 		return false
@@ -35,7 +45,7 @@ func (ud *UserDao) AddUser(user *model.User) bool {
 func (ud *UserDao) DelUser(u *model.User) bool {
 	
 	DBMgr.Delete(u)
-	if ud.GetUserInfo(u.Username).Username == "" {
+	if ud.CheckUserInfo(u).Username == "" {
 		return true
 	} else {
 		return false

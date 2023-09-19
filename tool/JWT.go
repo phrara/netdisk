@@ -16,8 +16,7 @@ type CustomClaims struct {
 	Uid string `json:"uid"`
 	jwt.RegisteredClaims        // 内嵌标准的声明
 }
-// 过期时间
-const TokenExpireDuration = time.Hour * 24
+
 // CustomSecret 密钥
 var CustomSecret = []byte(suffixSalt)
 
@@ -26,8 +25,8 @@ func GetToken(uid string) (string, error) {
 	claims := CustomClaims{
 		uid, // 自定义字段
 		jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(TokenExpireDuration)),
-			Issuer:    "phrara", // 签发人
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(Conf.Server.Token.expireDuration)),
+			Issuer:    Conf.Server.Token.Issuer, // 签发人
 		},
 	}
 	// 使用指定的签名方法创建签名对象

@@ -41,7 +41,7 @@ func posts(r *gin.Engine) {
 
 
 	// 用户管理
-	r.POST("/register", AddUserHandler)
+	r.POST("/register", UserRegisterHandler)
 	r.POST("/login", UserLoginHandler)
 	r.POST("/upwd", UpdatePasswordHandler)
 	r.POST("/delUser", DelUserHandler)

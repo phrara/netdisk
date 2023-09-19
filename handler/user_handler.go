@@ -10,7 +10,7 @@ import (
 var us = service.NewUserService()
 
 
-func AddUserHandler(c *gin.Context) {
+func UserRegisterHandler(c *gin.Context) {
 	user := model.NewUser(0, "", "")
 	err := c.ShouldBind(user)
 	if err != nil {
@@ -50,6 +50,6 @@ func UpdatePasswordHandler(c *gin.Context){
 	if err != nil {
 		return
 	}
-	b := us.UpdatePassword(u, u.NewPassword)
+	b := us.UpdatePassword(u)
 	c.JSON(200, b)
 }

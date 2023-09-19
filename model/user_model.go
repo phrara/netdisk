@@ -7,12 +7,13 @@ type (
 		Uid          int `gorm:"primary_key;column:uid" json:"uid"`
 		Username     string `gorm:"column:username" json:"username"`
 		Password     string `gorm:"column:password" json:"password"`
-
+		Email string `gorm:"column:email" json:"email"`
 		ExtInfo
 	}
 
 	ExtInfo struct {
-		NewPassword string `gorm:"-" json:"new_password"`
+		NewPassword string `gorm:"-" json:"new_password,omitempty"`
+		ACode string `gorm:"-" json:"a_code,omitempty"`
 	}
 )
 

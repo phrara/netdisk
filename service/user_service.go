@@ -23,13 +23,17 @@ func NewUserService() *UserService {
 func (us *UserService) UserRegister(user *model.User) tool.Res {
 	user.Username = strings.Trim(user.Username, " ")
 	if tool.WordsInspect(user.Username) {
-		// 口令加密
-		user.Password = tool.Encrypt(user.Password)
-		b := us.userdao.AddUser(user)
-		if b {
-			return tool.GetGoodResult(*user)
+		if us.userdao.CheckUserInfo(user).Username == "" {
+			// 口令加密
+			user.Password = tool.Encrypt(user.Password)
+			b := us.userdao.AddUser(user)
+			if b {
+				return tool.GetGoodResult(*user)
+			} else {
+				return tool.GetBadResult("register failed")
+			}
 		} else {
-			return tool.GetBadResult("register failed")
+			return tool.GetBadResult("the user exists")
 		}
 	} else {
 		return tool.GetBadResult("illegal words")
@@ -65,19 +69,19 @@ func (us *UserService) DeleteUser(user *model.User) tool.Res {
 }
 
 // 更改密码
-func (us *UserService) UpdatePassword(u *model.User, newPassword string) tool.Res {
+func (us *UserService) UpdatePassword(user *model.User) tool.Res {
 
-	u.Password = tool.Encrypt(u.Password)
-	if us.userdao.ValidateUser(u).Username == "" {
-		return tool.GetBadResult("pwd err")
-	}
 
-	u.Password = tool.Encrypt(newPassword)
+	// TODO: 验证码确认
 
-	b := us.userdao.UpdatePassword(u)	
-	if b {
+	user.Password = tool.Encrypt(user.NewPassword)
+
+	if us.userdao.UpdatePassword(user)	{
 		return tool.GetGoodResult(nil)
 	} else {
 		return tool.GetBadResult("err")
 	}
+
 }
+
+
