@@ -42,11 +42,11 @@ email:
     port: 465
   
   redis:
-  address: x.x.x.x:6379
-  password: xxxxxxxx
-  db: 0
-  poolSize: 20
-  expiration: 2m
+    address: x.x.x.x:6379
+    password: xxxxxxxx
+    db: 0
+    poolSize: 20
+    expiration: 2m
 ```
 
 
