@@ -8,6 +8,8 @@ type (
 		Username     string `gorm:"column:username" json:"username"`
 		Password     string `gorm:"column:password" json:"password"`
 		Email string `gorm:"column:email" json:"email"`
+		RootId int `gorm:"column:root_id" json:"root_id"`
+
 		ExtInfo
 	}
 

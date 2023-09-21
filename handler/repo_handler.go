@@ -88,13 +88,23 @@ func SavePersonalFileHandler(c *gin.Context) {
 
 }
 
-// 私人仓库列表
-func PersonalRepoListHandler(c *gin.Context) {
+// 上级私人仓库
+func ParentPersonalRepoListHandler(c *gin.Context) {
 	info := &model.PersonalRepository{}
 	if err := c.ShouldBind(info); err != nil {
 		return
 	}
-	r := rs.GetRepoList(info)
+	r := rs.GetParentRepoList(info)
+	c.JSON(200, r)
+}
+
+// 下级私人仓库列表
+func SubPersonalRepoListHandler(c *gin.Context) {
+	info := &model.PersonalRepository{}
+	if err := c.ShouldBind(info); err != nil {
+		return
+	}
+	r := rs.GetSubRepoList(info)
 	c.JSON(200, r)
 }
 
@@ -129,13 +139,23 @@ func SaveCourseFileHandler(c *gin.Context) {
 	c.JSON(200, r)
 }
 
-// 课程仓库列表
-func CourseRepoListHandler(c *gin.Context) {
+// 上级私人仓库
+func ParentCourseRepoListHandler(c *gin.Context) {
 	info := &model.CourseRepository{}
 	if err := c.ShouldBind(info); err != nil {
 		return
 	}
-	r := rs.GetRepoList(info)
+	r := rs.GetParentRepoList(info)
+	c.JSON(200, r)
+}
+
+// 下级课程仓库列表
+func SubCourseRepoListHandler(c *gin.Context) {
+	info := &model.CourseRepository{}
+	if err := c.ShouldBind(info); err != nil {
+		return
+	}
+	r := rs.GetSubRepoList(info)
 	c.JSON(200, r)
 }
 

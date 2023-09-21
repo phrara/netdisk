@@ -14,10 +14,19 @@ func (ud *UserDao) CheckUserInfo(user *model.User) *model.User {
 	return u
 }
 
-func (ud *UserDao) CheckEmail(user *model.User) bool {
+func (ud *UserDao) CheckUidNEmail(user *model.User) bool {
 	u := model.NewUser(0, "", "")
 	DBMgr.Where("uid = ? and email = ?", user.Uid, user.Email).First(u)
 	if u.Username != "" {
+		return true
+	} else {
+		return false
+	}
+}
+
+func(ud *UserDao) CheckEmail(user *model.User) bool {
+	u := model.NewUser(0, "", "")
+	if DBMgr.Where("email = ?", user.Email).First(u); u.Username != "" {
 		return true
 	} else {
 		return false
@@ -54,7 +63,18 @@ func (ud *UserDao) DelUser(u *model.User) bool {
 
 // 更改密码
 func (ud *UserDao) UpdatePassword(user *model.User) bool {
-	res := DBMgr.Model(user).Where("uid = ?",user.Uid).Update("password",user.Password)
+	res := DBMgr.Model(user).Where("uid = ?", user.Uid).Update("password", user.Password)
+	if res.RowsAffected > 0 {
+		return true
+	} else {
+		return false
+	}
+}
+
+
+// 更改仓库
+func (ud *UserDao) UpdateRootId(user *model.User) bool {
+	res := DBMgr.Model(user).Where("uid = ?", user.Uid).Update("root_id", user.RootId)
 	if res.RowsAffected > 0 {
 		return true
 	} else {

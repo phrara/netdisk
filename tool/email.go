@@ -8,12 +8,28 @@ import (
 	"github.com/jordan-wright/email"
 )
 
+func RegisterByEmail(userEmail, acode string) error {
+	e := email.NewEmail()
+	e.From = fmt.Sprintf("%s <%s>", Conf.Server.Name, Conf.Email.Username)
+	e.To = []string{userEmail}
+	e.Subject = "注册验证码"
+	e.HTML = []byte(emailHtmlPrefix + acode + emailHtmlSuffix)
+	if err := e.SendWithTLS(Conf.Email.SMTP.String(), smtp.PlainAuth("", Conf.Email.Username, Conf.Email.AuthCode, Conf.Email.SMTP.Host), &tls.Config{
+		InsecureSkipVerify: true,
+		ServerName:         Conf.Email.SMTP.Host,
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+
 func LoginByEmail(userEmail, acode string) error {
 	e := email.NewEmail()
 	e.From = fmt.Sprintf("%s <%s>", Conf.Server.Name, Conf.Email.Username)
 	e.To = []string{userEmail}
-	e.Subject = "验证码"
-	e.HTML = []byte(fmt.Sprintf(loginEmailHtml, "登录", acode))
+	e.Subject = "登录验证码"
+	e.HTML = []byte(emailHtmlPrefix + acode + emailHtmlSuffix)
 	if err := e.SendWithTLS(Conf.Email.SMTP.String(), smtp.PlainAuth("", Conf.Email.Username, Conf.Email.AuthCode, Conf.Email.SMTP.Host), &tls.Config{
 		InsecureSkipVerify: true,
 		ServerName:         Conf.Email.SMTP.Host,
@@ -27,8 +43,8 @@ func ResetPasswordEmail(userEmail, acode string) error {
 	e := email.NewEmail()
 	e.From = fmt.Sprintf("%s <%s>", Conf.Server.Name, Conf.Email.Username)
 	e.To = []string{userEmail}
-	e.Subject = "验证码"
-	e.HTML = []byte(fmt.Sprintf(loginEmailHtml, "重置密码", acode))
+	e.Subject = "密码修改验证码"
+	e.HTML = []byte(emailHtmlPrefix + acode + emailHtmlSuffix)
 	if err := e.SendWithTLS(Conf.Email.SMTP.String(), smtp.PlainAuth("", Conf.Email.Username, Conf.Email.AuthCode, Conf.Email.SMTP.Host), &tls.Config{
 		InsecureSkipVerify: true,
 		ServerName:         Conf.Email.SMTP.Host,
@@ -38,7 +54,7 @@ func ResetPasswordEmail(userEmail, acode string) error {
 	return nil
 }
 
-var loginEmailHtml = `
+var emailHtmlPrefix = `
 <head>
 <base target="_blank" />
 <style type="text/css">::-webkit-scrollbar{ display: none; }</style>
@@ -68,7 +84,8 @@ var loginEmailHtml = `
 			<div style="line-height:1.5;font-size:14px;margin-bottom:25px;color:#4d4d4d;">
 				<strong style="display:block;margin-bottom:15px;">尊敬的用户：<span style="color:#f60;font-size: 16px;"></span>您好！</strong>
 				<strong style="display:block;margin-bottom:15px;">
-					您正在进行<span style="color: red">%s</span>操作，请在验证码输入框中输入：<span style="color:#f60;font-size: 24px">%s</span>，以完成操作。
+					您的验证码为：`
+var emailHtmlSuffix = `
 				</strong>
 			</div>
 		</div>

@@ -1,6 +1,7 @@
 package tool
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -8,6 +9,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/tencentyun/cos-go-sdk-v5"
 	"gopkg.in/yaml.v3"
 )
@@ -15,6 +17,7 @@ import (
 var (
 	 Conf Config
 	 cosClient *cos.Client
+	 rdb *redis.Client
 )
 
 
@@ -49,6 +52,25 @@ func init() {
 			SecretKey: Conf.COS.SecretKey,
 		},
 	})
+
+	if d, err := time.ParseDuration(Conf.Redis.Expiration); err != nil {
+		log.Fatal(err)
+	} else {
+		Conf.Redis.expiration = d
+	}
+
+	rdb = redis.NewClient(&redis.Options{
+		Addr: Conf.Redis.Address,
+		Password: Conf.Redis.Password,
+		DB: Conf.Redis.DB,
+		PoolSize: Conf.Redis.PoolSize,
+	})
+	if _, err := rdb.Ping(context.Background()).Result(); err != nil {
+		log.Fatal(err)
+	} else {
+		log.Println("redis conneted")
+	}
+
 }
 
 
@@ -57,6 +79,7 @@ type Config struct {
 	COS        COS        `yaml:"cos"`
 	DataSource DataSource `yaml:"dataSource"`
 	Email Email `yaml:"email"`
+	Redis Redis `yaml:"redis"`
 }
 
 type Server struct {
@@ -110,4 +133,13 @@ type DataSource struct {
 
 func (d DataSource) String() string {
 	return fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", d.Username, d.Password, d.Address, d.Database)
+}
+
+type Redis struct {
+	Address string `yaml:"address"`
+	Password string `yaml:"password"`
+	DB int `yaml:"db"`
+	PoolSize int `yaml:"poolSize"`
+	Expiration string `yaml:"expiration"`
+	expiration time.Duration
 }

@@ -43,8 +43,12 @@ func posts(r *gin.Engine) {
 	// 用户管理
 	r.POST("/register", UserRegisterHandler)
 	r.POST("/login", UserLoginHandler)
+	r.POST("/loginByEmail", UserLoginByEmailHandler)
 	r.POST("/upwd", UpdatePasswordHandler)
 	r.POST("/delUser", DelUserHandler)
+	r.POST("/regEmail", RegisterSendCodeEmail)
+	r.POST("/logEmail", LoginSendCodeEmail)
+	r.POST("/upwdEmail", UpdatePasswordSendCodeEmail)
 
 	// 课程
 	r.POST("/addCourse", AddCourseHandler)
@@ -57,12 +61,14 @@ func posts(r *gin.Engine) {
 	r.POST("download", DownloadSourceHandler)
 	// 私人
 	r.POST("/personalSave", SavePersonalFileHandler)
-	r.POST("/personalList", PersonalRepoListHandler)
+	r.POST("/subPersonalList", SubPersonalRepoListHandler)
+	r.POST("/parentPersonalList", ParentPersonalRepoListHandler)
 	r.POST("/personalDel", DeletePersonalSourceHandler)
 	r.POST("/personalMove", MovePersonalSourceHandler)
 	// 课程
 	r.POST("/courseSave", SaveCourseFileHandler)
-	r.POST("/courseList", CourseRepoListHandler)
+	r.POST("/subCourseList", SubCourseRepoListHandler)
+	r.POST("/parentCourseList", ParentCourseRepoListHandler)
 	r.POST("/courseDel", DeleteCourseSourceHandler)
 	r.POST("/courseMove", MoveCourseSourceHandler)
 }
@@ -72,7 +78,7 @@ func TokenVerify() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
 
-		if ctx.FullPath() == "/register" || ctx.FullPath() == "/login" {
+		if ctx.FullPath() == "/register" || ctx.FullPath() == "/login" || ctx.FullPath() == "/regEmail" || ctx.FullPath() == "/logEmail" || ctx.FullPath() == "/upwdEmail" || ctx.FullPath() == "/loginByEmail" {
 			ctx.Next()
 			return
 		}

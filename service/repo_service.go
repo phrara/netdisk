@@ -109,7 +109,8 @@ func (rs *RepoService) SaveCourseSource(pr *model.CourseRepository) tool.Res {
 	}
 }
 
-func (rs *RepoService) GetRepoList(info model.Repo) tool.Res {
+// !下级目录
+func (rs *RepoService) GetSubRepoList(info model.Repo) tool.Res {
 
 	switch rp := info.(type) {
 	case *model.PersonalRepository:
@@ -117,14 +118,30 @@ func (rs *RepoService) GetRepoList(info model.Repo) tool.Res {
 			list := rs.repoDao.TotalRepoList()
 			return tool.GetGoodResult(list)
 		} else {
-			list := rs.repoDao.PersonalRepoList(rp)
+			list := rs.repoDao.PersonalRepoList(rp.Uid, rp.PRid)
 			return tool.GetGoodResult(list)
 		}
 	case *model.CourseRepository:
 		rp.Cid = 1
-		list := rs.repoDao.CourseRepoList(rp)
+		list := rs.repoDao.CourseRepoList(rp.Cid, rp.CRid)
 		return tool.GetGoodResult(list)
 	default: 
+		return tool.GetBadResult("unkown type")
+	}
+}
+
+// !上级目录
+func (rs *RepoService) GetParentRepoList(info model.Repo) tool.Res {
+	switch rp := info.(type) {
+	case *model.PersonalRepository:
+		pr := rs.repoDao.PersonalRepoDetail(rp.ParentId)
+		list := rs.repoDao.PersonalRepoList(pr.Uid, pr.ParentId)
+		return tool.GetGoodResult(list)
+	case *model.CourseRepository:
+		cr := rs.repoDao.CourseRepoDetail(rp.ParentId)
+		list := rs.repoDao.CourseRepoList(cr.Cid, cr.ParentId)
+		return tool.GetGoodResult(list)
+	default:
 		return tool.GetBadResult("unkown type")
 	}
 }

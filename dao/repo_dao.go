@@ -56,9 +56,15 @@ func (rd *RepoDao) AddPersonalRepo(rp *model.PersonalRepository) bool {
 	}
 }
 
-func (rd *RepoDao) PersonalRepoList(info *model.PersonalRepository) []*model.PersonalRepository {
+func (rd *RepoDao) PersonalRepoDetail(prid int) *model.PersonalRepository {
+	r := &model.PersonalRepository{}
+	DBMgr.Where("prid = ?", prid).First(r)
+	return r
+}
+
+func (rd *RepoDao) PersonalRepoList(uid, parentID int) []*model.PersonalRepository {
 	rpList := make([]*model.PersonalRepository, 10)
-	DBMgr.Where("uid = ? and parent_id = ?", info.Uid, info.ParentId).Find(&rpList)
+	DBMgr.Where("uid = ? and parent_id = ?", uid, parentID).Find(&rpList)
 	return rpList
 }
 
@@ -98,9 +104,15 @@ func (rd *RepoDao) AddCourseRepo(rp *model.CourseRepository) bool {
 	}
 }
 
-func (rd *RepoDao) CourseRepoList(info *model.CourseRepository) []*model.CourseRepository {
+func (rd *RepoDao) CourseRepoDetail(crid int) *model.CourseRepository {
+	r := &model.CourseRepository{}
+	DBMgr.Where("crid = ?", crid).First(r)
+	return r
+}
+
+func (rd *RepoDao) CourseRepoList(cid, parentID int) []*model.CourseRepository {
 	rpList := make([]*model.CourseRepository, 10)
-	DBMgr.Where("cid = ? and parent_id = ?", info.Cid, info.ParentId).Find(&rpList)
+	DBMgr.Where("cid = ? and parent_id = ?", cid, parentID).Find(&rpList)
 	return rpList
 }
 

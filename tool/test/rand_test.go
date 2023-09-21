@@ -1,14 +1,17 @@
-package tool
+package test
 
 import (
 	"fmt"
 	"math/rand"
 	"strconv"
+	"testing"
 	"time"
 )
 
-
-
+func TestRand(t *testing.T) {
+	s := CreateCaptcha(6)
+	t.Log(s)
+}
 
 func CreateCaptcha(num int) string {
 	str := "1"
