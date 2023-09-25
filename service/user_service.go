@@ -84,6 +84,7 @@ func (us *UserService) UserLogin(user *model.User) tool.Res {
 // 验证码登录
 func (us *UserService) UserLoginByEmail(u *model.User) tool.Res {
 	if code, b := tool.RedisGetVal(u.Email); b {
+		// fmt.Println(u.ACode, "sssss", code)
 		if u.ACode == code {
 			u.Username = u.Email
 			validatedUser := us.userDao.CheckUserInfo(u)

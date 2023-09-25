@@ -11,15 +11,22 @@ import (
 func RouteInit(r *gin.Engine, indexPath string) {
 
 	// token 验签
-	r.Use(TokenVerify())
+	// r.Use(TokenVerify())
 
 	// 加载静态文件
-	r.Static("/dist", "../dist")
-	r.Static("/assets", "../dist/assets")
+	r.Static("/dist", "./dist")
+	// r.Static("/css", "./dist/css")
+	// r.Static("/js", "./dist/js")
+	r.Static("/static/img", "./dist/static/img")
+	// r.Static("/fonts", "./dist/fonts")
 
 
 	// 首页跳转路由
 	r.GET("/", func(c *gin.Context) {
+		c.Request.URL.Path = indexPath
+		r.HandleContext(c)
+	})
+	r.GET("/login", func(c *gin.Context) {
 		c.Request.URL.Path = indexPath
 		r.HandleContext(c)
 	})
@@ -58,7 +65,7 @@ func posts(r *gin.Engine) {
 	// 公共资源仓库
 	r.POST("/upload", UploadSourceHandler)
 	r.POST("/detail", DetailSourceHandler)
-	r.POST("download", DownloadSourceHandler)
+	r.POST("/download", DownloadSourceHandler)
 	// 私人
 	r.POST("/personalSave", SavePersonalFileHandler)
 	r.POST("/subPersonalList", SubPersonalRepoListHandler)

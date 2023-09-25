@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"netdisk/dao"
 	"netdisk/model"
 	"netdisk/tool"
@@ -28,9 +29,9 @@ func (rs *RepoService) UploadSource(repo *model.Repository, content []byte) tool
 			// 上传到COS
 			cosPath := tool.Conf.COS.InnerPath + repo.Hash + repo.Ext
 			// 小文件
-			if repo.Size <= tool.Conf.COS.ChunkSize {
+			if repo.Size <= tool.Conf.COS.ChunkSize * 1024 * 1024 {
 				if err := tool.COSUpload(content, cosPath); err != nil {
-					return tool.GetBadResult("COS upload failed")
+					return tool.GetBadResult(fmt.Errorf("%w: COS upload failed", err).Error())
 				} 
 			} else {
 				// 分片
@@ -62,6 +63,7 @@ func (rs *RepoService) GetRepoDetails(repo *model.Repository) tool.Res {
 
 func (rs *RepoService) DownloadSource(repo *model.Repository) tool.Res {
 	r := rs.repoDao.RepoDetail(repo)
+	// fmt.Println(repo, r)
 	if r.Hash != "" && r.Path != "" {
 		if file, err := tool.COSDownload(r.Path); err != nil {
 			return tool.GetBadResult("COS download failed")
@@ -69,7 +71,7 @@ func (rs *RepoService) DownloadSource(repo *model.Repository) tool.Res {
 			return tool.GetGoodResult(file)
 		}
 	} else {
-		return tool.GetBadResult("source do not exists")
+		return tool.GetBadResult("source do not exist")
 	}
 }
 

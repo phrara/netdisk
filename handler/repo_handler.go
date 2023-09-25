@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"netdisk/model"
 	"netdisk/service"
 	"path"
@@ -60,14 +61,19 @@ func DownloadSourceHandler(c *gin.Context) {
 
 	if r["msg"] == "ok" {
 		file := r["data"].([]byte)
+		// 解决文件名中文乱码
+		filename := url.QueryEscape(repo.Filename)
 		// 设置响应头
 		c.Header("Content-Type", "application/octet-stream")
-		c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", repo.Filename))
+		c.Header("Access-Control-Expose-Headers", "Content-Disposition")
+		c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
 		c.Header("Content-Transfer-Encoding", "binary")
 		c.Header("Cache-Control", "no-cache")
 		c.Header("Pragma", "no-cache")
 		if _, err := io.Copy(c.Writer, bytes.NewReader(file)); err != nil {
-			c.String(http.StatusInternalServerError, fmt.Sprintf("Copy file error: %s", err.Error()))
+			c.String(http.StatusInternalServerError, fmt.Sprintf("download file error: %s", err.Error()))
+		} else {
+			c.Status(http.StatusOK)
 		}
 	} else {
 		c.JSON(http.StatusInternalServerError, r)
